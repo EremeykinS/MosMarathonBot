@@ -62,7 +62,9 @@ def main_menu(bot, update):
 
 def about(bot, update):
     uid = update.message.from_user.id
-    bot.sendMessage(uid, text=main_kbd[1][1] + "?? О как... ну ладно, " + main_kbd[1][1] + ", %s!" % chat[uid]['name'], reply_markup=kbd(main_kbd))
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.info, reply_markup=kbd(main_kbd), parse_mode="HTML")
+    return MAIN_MENU
 
 
 def qa(bot, update):
