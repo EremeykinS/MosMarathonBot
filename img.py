@@ -1,0 +1,2 @@
+route_10km = 'AgADAgADqqcxGyxIYw4-wERPEmPUXA4ecQ0ABKJ_eASzNDDsm9sAAgI'
+route_42km = 'AgADAgADqacxGyxIYw6v-PxiH6dhVmgMcQ0ABOxmS6xBB4HsudYAAgI'

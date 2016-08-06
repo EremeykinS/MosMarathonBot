@@ -1,6 +1,7 @@
 from config import *
 from keyboards import *
 import texts
+import img
 # from wit import Wit
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, RegexHandler
 import logging
@@ -10,14 +11,14 @@ import telegram
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('Maraphon_test_bot.' + __name__)
 
-NAME, AGE, MAIN_MENU, MARATHON, QA, PAIN, ABOUT = range(7)
+NAME, AGE, MAIN_MENU, MARATHON, QA, PAIN, ABOUT, ROUTE = range(8)
 
 chat = dict()
 typing = telegram.ChatAction.TYPING
 
 
 def kbd(k):
-    return telegram.ReplyKeyboardMarkup(k, one_time_keyboard=True)
+    return telegram.ReplyKeyboardMarkup(k, one_time_keyboard=True, resize_keyboard=True)
 
 
 def flatten(nl):
@@ -49,6 +50,9 @@ def main_menu(bot, update):
         chat[uid]['age'] = ans
         bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
         return MAIN_MENU
+    elif ans == main_menu_kbd[0][0]:
+        bot.sendMessage(uid, text="Ну все %s, ты в главном меню ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
+        return MAIN_MENU
     elif chat[uid]['prev_state'] == MAIN_MENU:
         chat[uid]['prev_state'] = MAIN_MENU
         if ans not in flatten(main_kbd):
@@ -73,7 +77,36 @@ def pain(bot, update):
 
 def marathon(bot, update):
     uid = update.message.from_user.id
-    bot.sendMessage(uid, text="Тут будут красивые картинки!", reply_markup=kbd(main_kbd))
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.about_marathon, reply_markup=kbd(marathon_kbd), parse_mode="HTML")
+    return MARATHON
+
+
+def route(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.route, reply_markup=kbd(distance_kbd), parse_mode="HTML")
+    return ROUTE
+
+
+def schedule(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.schedule, reply_markup=kbd(marathon_kbd), parse_mode="HTML")
+
+
+def distance_42(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.route_42km, parse_mode="HTML")
+    bot.sendPhoto(uid, photo=img.route_42km, reply_markup=kbd(distance_kbd))
+
+
+def distance_10(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.route_10km, parse_mode="HTML")
+    bot.sendPhoto(uid, photo=img.route_10km, reply_markup=kbd(distance_kbd))
 
 
 def helper(bot, update):
@@ -97,7 +130,7 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    # Add conversation handler with the states
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
 
@@ -108,7 +141,15 @@ def main():
                         RegexHandler(main_kbd[1][0], pain),
                         RegexHandler(main_kbd[1][1], about),
                         MessageHandler([Filters.text], main_menu)],
-            ABOUT: [MessageHandler([Filters.text], about)]
+            ABOUT: [MessageHandler([Filters.text], about)],
+            MARATHON: [RegexHandler(flatten(marathon_kbd)[0], schedule),
+                        RegexHandler(flatten(marathon_kbd)[1], route),
+                        RegexHandler(flatten(marathon_kbd)[2], main_menu),
+                        MessageHandler([Filters.text], main_menu)],
+            ROUTE: [RegexHandler(distance_kbd[0][0], distance_42),
+                        RegexHandler(distance_kbd[0][1], distance_10),
+                        RegexHandler(distance_kbd[0][2], main_menu),
+                        MessageHandler([Filters.text], main_menu)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
