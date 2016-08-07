@@ -12,9 +12,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
-LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
-BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
-HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10 = range(44)
+    LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
+    BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
+    HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
+    APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6 = range(51)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
@@ -663,10 +664,91 @@ def hand_a10(bot, update):
     return MAIN_MENU
 
 
-def answer_disease(bot, update):
+def apnea_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text="zaglushka-otvet", reply_markup=kbd(main_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_Q2
+
+
+def apnea_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_Q3
+
+
+def apnea_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_Q4
+
+
+def apnea_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_Q5
+
+
+def apnea_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_Q6
+
+
+def apnea_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    return APNEA_FA
+
+
+def apnea_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def apnea_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def apnea_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def apnea_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def apnea_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.apnea_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def apnea_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.apnea_a6y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.apnea_a6n, reply_markup=kbd(main_kbd))
     return MAIN_MENU
 
 
@@ -728,7 +810,7 @@ def main():
                              RegexHandler(flatten(diseases_kbd)[1], back_q1),
                              RegexHandler(flatten(diseases_kbd)[2], chest_q1),
                              RegexHandler(flatten(diseases_kbd)[3], hand_q1),
-                             RegexHandler(flatten(diseases_kbd)[4], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[4], apnea_q1),
                              RegexHandler(flatten(diseases_kbd)[5], back_q1),
                              RegexHandler(flatten(diseases_kbd)[6], back_q1),
                              RegexHandler(flatten(diseases_kbd)[7], main_menu),
@@ -830,6 +912,25 @@ def main():
             HAND_FA: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a10),
                       RegexHandler(flatten(yes_no_kbd)[no], hand_a10),
                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+
+            APNEA_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a1),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_q2),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            APNEA_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a2),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_q3),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            APNEA_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a3),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_q4),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            APNEA_Q5: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a4),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_q5),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            APNEA_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a5),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_q6),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            APNEA_FA: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a6),
+                       RegexHandler(flatten(yes_no_kbd)[no], apnea_a6),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
         fallbacks=[CommandHandler('stop', stop)]
