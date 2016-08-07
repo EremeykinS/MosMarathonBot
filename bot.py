@@ -12,10 +12,12 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
-    LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
-    BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
-    HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
-    APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6 = range(51)
+LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
+BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
+HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
+APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6, \
+CONVULSION_FA, CONVULSION_Q2, CONVULSION_Q3, CONVULSION_Q4, CONVULSION_Q5, CONVULSION_Q6, CONVULSION_Q7, \
+CONVULSION_Q8 = range(59)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
@@ -752,6 +754,128 @@ def apnea_a6(bot, update):
     return MAIN_MENU
 
 
+def convulsion_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q2
+
+
+def convulsion_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q3
+
+
+def convulsion_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q4
+
+
+def convulsion_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q5
+
+
+def convulsion_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q6
+
+
+def convulsion_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q7
+
+
+def convulsion_q7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_Q8
+
+
+def convulsion_q8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    return CONVULSION_FA
+
+
+def convulsion_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[6 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.convulsion_a[7 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def convulsion_a8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.convulsion_a8y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.convulsion_a8n, reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def nothing_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.no_disease, reply_markup=kbd(main_menu_kbd))
+
+
 def helper(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
 
@@ -811,8 +935,8 @@ def main():
                              RegexHandler(flatten(diseases_kbd)[2], chest_q1),
                              RegexHandler(flatten(diseases_kbd)[3], hand_q1),
                              RegexHandler(flatten(diseases_kbd)[4], apnea_q1),
-                             RegexHandler(flatten(diseases_kbd)[5], back_q1),
-                             RegexHandler(flatten(diseases_kbd)[6], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[5], convulsion_q1),
+                             RegexHandler(flatten(diseases_kbd)[6], nothing_q1),
                              RegexHandler(flatten(diseases_kbd)[7], main_menu),
                              MessageHandler([Filters.text], main_menu)] + command_handlers,
 
@@ -931,6 +1055,31 @@ def main():
             APNEA_FA: [RegexHandler(flatten(yes_no_kbd)[yes], apnea_a6),
                        RegexHandler(flatten(yes_no_kbd)[no], apnea_a6),
                        MessageHandler([Filters.text], main_menu)] + command_handlers,
+
+            CONVULSION_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a1),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q2),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a2),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q3),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a3),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q4),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q5: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a4),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q5),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a5),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q6),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q7: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a6),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q7),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_Q8: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a7),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_q8),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CONVULSION_FA: [RegexHandler(flatten(yes_no_kbd)[yes], convulsion_a8),
+                            RegexHandler(flatten(yes_no_kbd)[no], convulsion_a8),
+                            MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
         fallbacks=[CommandHandler('stop', stop)]
