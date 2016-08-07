@@ -1,5 +1,7 @@
 import texts
 from telegram import Emoji
+yes = 0
+no = 1
 back_pic = Emoji.BACK_WITH_LEFTWARDS_ARROW_ABOVE
 main_menu_kbd = [["Главное меню"]]
 main_kbd = [["О марафоне", "Частые вопросы"], ["Здоровье", "О Боте"]]
@@ -13,3 +15,7 @@ health_c1_q_kbd = [[q] for q in texts.health_c1_q] + [[texts.back_to_health_cat_
 health_c2_q_kbd = [[q] for q in texts.health_c2_q] + [[texts.back_to_health_cat_btn]]
 clothes_q_kbd = [[q] for q in texts.clothes_q] + [[texts.back_to_all_cat_btn]]
 regime_q_kbd = [[q] for q in texts.regime_q] + [[texts.back_to_all_cat_btn]]
+diseases_kbd = [["Боль в ноге"], ["Боль в пояснице"],
+                ["Боль в груди"], ["Боль в руке"],
+                ["Одышка"], ["Судороги"],
+                ["Ничего"], [back_pic + "Вернуться в Главное меню"]]

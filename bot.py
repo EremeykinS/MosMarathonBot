@@ -11,7 +11,8 @@ import telegram
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
-NAME, AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER = range(11)
+AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
+    LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6 = range(19)
 
 chat = dict()
 typing = telegram.ChatAction.TYPING
@@ -27,39 +28,44 @@ def flatten(nl):
 
 def start(bot, update):
     bot.sendMessage(update.message.chat_id, text=texts.welcome)
-    return NAME
+    return AGE
 
 
-def name(bot, update):
+def age(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     chat[uid] = dict()
     chat[uid]['name'] = ans
-    chat[uid]['prev_state'] = NAME
     bot.sendMessage(uid, text=texts.greeting % ans, reply_markup=kbd(age_kbd))
-    return MAIN_MENU
+    return CHECK_AGE
+
+
+def check_age(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans not in flatten(age_kbd):
+        bot.sendMessage(uid, text=texts.wrong_age % chat[uid]['name'], reply_markup=kbd(age_kbd))
+        return AGE
+    else:
+        chat[uid]['age'] = ans
+        bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
+        return MAIN_MENU
 
 
 def main_menu(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
-    if chat[uid]['prev_state'] == NAME:
-        chat[uid]['prev_state'] = MAIN_MENU
-        chat[uid]['age'] = ans
+    if main_menu_kbd[0][0] in ans:
         bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
         return MAIN_MENU
-    elif ans == main_menu_kbd[0][0]:
-        bot.sendMessage(uid, text="Ну все %s, ты в главном меню ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
+    else:
+        bot.sendMessage(uid,
+        text="Ага %s, вопрос спрашиваешь!! постараюсь ответить, но в другой раз ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
         return MAIN_MENU
-    elif chat[uid]['prev_state'] == MAIN_MENU:
-        chat[uid]['prev_state'] = MAIN_MENU
-        if ans not in flatten(main_kbd):
-            bot.sendMessage(uid,
-                            text="Ага %s, вопрос спрашиваешь!! постараюсь ответить, но в другой раз ахахах" % chat[uid][
-                                'name'], reply_markup=kbd(main_kbd))
-            return MAIN_MENU
+
 
 
 def info(bot, update):
@@ -74,11 +80,6 @@ def qa(bot, update):
     bot.sendChatAction(uid, action=typing)
     bot.sendMessage(uid, text=texts.select_cat, reply_markup=kbd(main_cat_kbd))
     return SELECT_CAT
-
-
-def pain(bot, update):
-    uid = update.message.from_user.id
-    bot.sendMessage(uid, text="Тут будет все про БОЛЬ !", reply_markup=kbd(main_kbd))
 
 
 def about(bot, update):
@@ -194,6 +195,115 @@ def answer(bot, update):
     return next_state
 
 
+def diseases(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.select_disease, reply_markup=kbd(diseases_kbd))
+    return SELECT_DISEASE
+
+
+def leg_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return LEG_Q2
+
+
+def leg_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return LEG_Q3
+
+
+def leg_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return LEG_Q4
+
+
+def leg_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return LEG_Q5
+
+
+def leg_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return LEG_Q6
+
+
+def leg_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_q[6-1], reply_markup=kbd(yes_no_kbd))
+    return LEG_FA
+
+
+def leg_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def leg_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def leg_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def leg_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def leg_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.leg_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def leg_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.leg_a6y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.leg_a6n, reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text="zaglushka", reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def answer_disease(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text="zaglushka-otvet", reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
 def helper(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
 
@@ -225,10 +335,11 @@ def main():
         entry_points=command_handlers,
 
         states={
-            NAME: [MessageHandler([Filters.text], name)],
+            AGE: [MessageHandler([Filters.text], age)],
+            CHECK_AGE: [MessageHandler([Filters.text], check_age)],
             MAIN_MENU: [RegexHandler(main_kbd[0][0], about),
                         RegexHandler(main_kbd[0][1], qa),
-                        RegexHandler(main_kbd[1][0], pain),
+                        RegexHandler(main_kbd[1][0], diseases),
                         RegexHandler(main_kbd[1][1], info),
                         MessageHandler([Filters.text], main_menu)] + command_handlers,
             INFO: [MessageHandler([Filters.text], info)] + command_handlers,
@@ -248,19 +359,39 @@ def main():
                          MessageHandler([Filters.text], main_menu)] + command_handlers,
             HEALTH_Q: [MessageHandler([Filters.text], health_q)] + command_handlers,
             ANSWER: [MessageHandler([Filters.text], answer)] + command_handlers,
+            SELECT_DISEASE: [RegexHandler(flatten(diseases_kbd)[0], leg_q1),
+                             RegexHandler(flatten(diseases_kbd)[1], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[2], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[3], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[4], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[5], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[6], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[7], main_menu),
+                             MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a1),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q3),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a2),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q4),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a3),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q5),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_Q5: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a4),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q6),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a5),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q6),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+            LEG_FA: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a6),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_a6),
+                     MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-    # questions_handler = CommandHandler('questions', qa)
-    # about_handler = CommandHandler('about', about)
-    # info_handler = CommandHandler('info', info)
-
     dp.add_handler(conv_handler)
-    # dp.add_handler(questions_handler)
-    # dp.add_handler(about_handler)
-    # dp.add_handler(info_handler)
 
     # log all errors
     dp.add_error_handler(error)
