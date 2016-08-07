@@ -12,8 +12,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
-LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, BACK_Q6, BACK_Q7 = range(
-    26)
+LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
+BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
+HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10 = range(44)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
@@ -67,9 +68,6 @@ def main_menu(bot, update):
         bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
         return MAIN_MENU
     else:
-        # bot.sendMessage(uid,
-        # text="Ага %s, вопрос спрашиваешь!! постараюсь ответить, но в другой раз ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
-        # return MAIN_MENU
         client_answer = client.message(ans)
         print(client_answer)
         try:
@@ -149,7 +147,6 @@ def health_q(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
-    # text = texts.select_q
     next_state = ANSWER
     if ans == flatten(health_cat_kbd)[0]:
         keyboard = health_c1_q_kbd
@@ -157,7 +154,6 @@ def health_q(bot, update):
         keyboard = health_c2_q_kbd
     elif ans == flatten(health_cat_kbd)[2]:
         next_state = SELECT_CAT
-        # text = texts.select_cat
         keyboard = main_cat_kbd
     bot.sendMessage(uid, text=texts.select_q, reply_markup=kbd(keyboard))
     return next_state
@@ -407,6 +403,266 @@ def back_a7(bot, update):
     return MAIN_MENU
 
 
+def chest_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q2
+
+
+def chest_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q3
+
+
+def chest_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q4
+
+
+def chest_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q5
+
+
+def chest_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q6
+
+
+def chest_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q7
+
+
+def chest_q7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_Q8
+
+
+def chest_q8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    return CHEST_FA
+
+
+def chest_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[6 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.chest_a[7 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def chest_a8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.chest_a8y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.chest_a8n, reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_q1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q2
+
+
+def hand_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q3
+
+
+def hand_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q4
+
+
+def hand_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q5
+
+
+def hand_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q6
+
+
+def hand_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q7
+
+
+def hand_q7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q8
+
+
+def hand_q8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q9
+
+
+def hand_q9(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[9 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_Q10
+
+
+def hand_q10(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_q[10 - 1], reply_markup=kbd(yes_no_kbd))
+    return HAND_FA
+
+
+def hand_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[6 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[7 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a8(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[8 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a9(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.hand_a[9 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def hand_a10(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.hand_a10y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.hand_a10n, reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
 def answer_disease(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
@@ -423,8 +679,7 @@ def error(bot, update, error):
 
 
 def stop(bot, update):
-    bot.sendMessage(update.message.chat_id,
-                    text='Bye! I hope we can talk again some day.')
+    bot.sendMessage(update.message.chat_id, text='Bye! I hope we can talk again some day.')
     return ConversationHandler.END
 
 
@@ -471,8 +726,8 @@ def main():
             ANSWER: [MessageHandler([Filters.text], answer)] + command_handlers,
             SELECT_DISEASE: [RegexHandler(flatten(diseases_kbd)[0], leg_q1),
                              RegexHandler(flatten(diseases_kbd)[1], back_q1),
-                             RegexHandler(flatten(diseases_kbd)[2], back_q1),
-                             RegexHandler(flatten(diseases_kbd)[3], back_q1),
+                             RegexHandler(flatten(diseases_kbd)[2], chest_q1),
+                             RegexHandler(flatten(diseases_kbd)[3], hand_q1),
                              RegexHandler(flatten(diseases_kbd)[4], back_q1),
                              RegexHandler(flatten(diseases_kbd)[5], back_q1),
                              RegexHandler(flatten(diseases_kbd)[6], back_q1),
@@ -518,6 +773,62 @@ def main():
                       MessageHandler([Filters.text], main_menu)] + command_handlers,
             BACK_FA: [RegexHandler(flatten(yes_no_kbd)[yes], back_a7),
                       RegexHandler(flatten(yes_no_kbd)[no], back_a7),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+
+            CHEST_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a1),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_q2),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q3: [RegexHandler(flatten(yes_no_kbd)[no], chest_a2),
+                       RegexHandler(flatten(yes_no_kbd)[yes], chest_q3),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q4: [RegexHandler(flatten(yes_no_kbd)[no], chest_a3),
+                       RegexHandler(flatten(yes_no_kbd)[yes], chest_q4),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q5: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a4),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_q5),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a5),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_q6),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q7: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a6),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_q7),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_Q8: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a7),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_q8),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            CHEST_FA: [RegexHandler(flatten(yes_no_kbd)[yes], chest_a8),
+                       RegexHandler(flatten(yes_no_kbd)[no], chest_a8),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+
+            HAND_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a1),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q2),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a2),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q3),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a3),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q4),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q5: [RegexHandler(flatten(yes_no_kbd)[no], hand_a4),
+                      RegexHandler(flatten(yes_no_kbd)[yes], hand_q5),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a5),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q6),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q7: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a6),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q7),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q8: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a7),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q8),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q9: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a8),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_q9),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_Q10: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a9),
+                       RegexHandler(flatten(yes_no_kbd)[no], hand_q10),
+                       MessageHandler([Filters.text], main_menu)] + command_handlers,
+            HAND_FA: [RegexHandler(flatten(yes_no_kbd)[yes], hand_a10),
+                      RegexHandler(flatten(yes_no_kbd)[no], hand_a10),
                       MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
