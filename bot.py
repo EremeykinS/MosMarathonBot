@@ -12,11 +12,13 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
-    LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6 = range(19)
+LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, BACK_Q6, BACK_Q7 = range(
+    26)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
 client = Wit(access_token=wit_token, actions=dict())
+
 
 def kbd(k):
     return telegram.ReplyKeyboardMarkup(k, one_time_keyboard=True, resize_keyboard=True)
@@ -79,7 +81,6 @@ def main_menu(bot, update):
                 bot.sendMessage(uid, text=text, reply_markup=kbd(main_kbd))
         except KeyError:
             bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd))
-
 
 
 def info(bot, update):
@@ -254,7 +255,7 @@ def leg_q5(bot, update):
 def leg_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[6-1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[6 - 1], reply_markup=kbd(yes_no_kbd))
     return LEG_FA
 
 
@@ -307,7 +308,102 @@ def leg_a6(bot, update):
 def back_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text="zaglushka", reply_markup=kbd(main_kbd))
+    bot.sendMessage(uid, text=texts.back_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q2
+
+
+def back_q2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q3
+
+
+def back_q3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q4
+
+
+def back_q4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q5
+
+
+def back_q5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q6
+
+
+def back_q6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_Q7
+
+
+def back_q7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    return BACK_FA
+
+
+def back_a1(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[1 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a2(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[2 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a3(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[3 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a4(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[4 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a5(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[5 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a6(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.back_a[6 - 1], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
+
+
+def back_a7(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    ans = update.message.text
+    if ans == flatten(yes_no_kbd)[yes]:
+        bot.sendMessage(uid, text=texts.back_a7y, reply_markup=kbd(main_kbd))
+    elif ans == flatten(yes_no_kbd)[no]:
+        bot.sendMessage(uid, text=texts.back_a7n, reply_markup=kbd(main_kbd))
     return MAIN_MENU
 
 
@@ -382,17 +478,18 @@ def main():
                              RegexHandler(flatten(diseases_kbd)[6], back_q1),
                              RegexHandler(flatten(diseases_kbd)[7], main_menu),
                              MessageHandler([Filters.text], main_menu)] + command_handlers,
+
             LEG_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a1),
-                     RegexHandler(flatten(yes_no_kbd)[no], leg_q3),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q2),
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
             LEG_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a2),
-                     RegexHandler(flatten(yes_no_kbd)[no], leg_q4),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q3),
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
             LEG_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a3),
-                     RegexHandler(flatten(yes_no_kbd)[no], leg_q5),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q4),
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
             LEG_Q5: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a4),
-                     RegexHandler(flatten(yes_no_kbd)[no], leg_q6),
+                     RegexHandler(flatten(yes_no_kbd)[no], leg_q5),
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
             LEG_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a5),
                      RegexHandler(flatten(yes_no_kbd)[no], leg_q6),
@@ -400,6 +497,28 @@ def main():
             LEG_FA: [RegexHandler(flatten(yes_no_kbd)[yes], leg_a6),
                      RegexHandler(flatten(yes_no_kbd)[no], leg_a6),
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+
+            BACK_Q2: [RegexHandler(flatten(yes_no_kbd)[yes], back_a1),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_q2),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_Q3: [RegexHandler(flatten(yes_no_kbd)[yes], back_a2),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_q3),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_Q4: [RegexHandler(flatten(yes_no_kbd)[yes], back_a3),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_q4),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_Q5: [RegexHandler(flatten(yes_no_kbd)[no], back_a4),
+                      RegexHandler(flatten(yes_no_kbd)[yes], back_q5),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_Q6: [RegexHandler(flatten(yes_no_kbd)[yes], back_a5),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_q6),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_Q7: [RegexHandler(flatten(yes_no_kbd)[yes], back_a6),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_q7),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
+            BACK_FA: [RegexHandler(flatten(yes_no_kbd)[yes], back_a7),
+                      RegexHandler(flatten(yes_no_kbd)[no], back_a7),
+                      MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
         fallbacks=[CommandHandler('stop', stop)]
