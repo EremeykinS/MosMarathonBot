@@ -2,7 +2,7 @@ from config import *
 from keyboards import *
 import texts
 import img
-# from wit import Wit
+from wit import Wit
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, RegexHandler
 import logging
 import telegram
@@ -14,9 +14,9 @@ logger = logging.getLogger('Marathon_test_bot.' + __name__)
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
     LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6 = range(19)
 
-chat = dict()
 typing = telegram.ChatAction.TYPING
-
+chat = dict()
+client = Wit(access_token=wit_token, actions=dict())
 
 def kbd(k):
     return telegram.ReplyKeyboardMarkup(k, one_time_keyboard=True, resize_keyboard=True)
@@ -35,9 +35,12 @@ def age(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
-    chat[uid] = dict()
-    chat[uid]['name'] = ans
-    bot.sendMessage(uid, text=texts.greeting % ans, reply_markup=kbd(age_kbd))
+    if chat.get(uid) is None:
+        chat[uid] = dict()
+        chat[uid]['name'] = ans
+        bot.sendMessage(uid, text=texts.greeting % ans, reply_markup=kbd(age_kbd))
+    else:
+        bot.sendMessage(uid, text=texts.greeting % chat[uid]['name'], reply_markup=kbd(age_kbd))
     return CHECK_AGE
 
 
@@ -47,7 +50,7 @@ def check_age(bot, update):
     ans = update.message.text
     if ans not in flatten(age_kbd):
         bot.sendMessage(uid, text=texts.wrong_age % chat[uid]['name'], reply_markup=kbd(age_kbd))
-        return AGE
+        return CHECK_AGE
     else:
         chat[uid]['age'] = ans
         bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
@@ -62,9 +65,20 @@ def main_menu(bot, update):
         bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
         return MAIN_MENU
     else:
-        bot.sendMessage(uid,
-        text="Ага %s, вопрос спрашиваешь!! постараюсь ответить, но в другой раз ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
-        return MAIN_MENU
+        # bot.sendMessage(uid,
+        # text="Ага %s, вопрос спрашиваешь!! постараюсь ответить, но в другой раз ахахах" % chat[uid]['name'], reply_markup=kbd(main_kbd))
+        # return MAIN_MENU
+        client_answer = client.message(ans)
+        print(client_answer)
+        try:
+            if client_answer['entities']['intent'][0]['confidence'] < 0.6:
+                bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd))
+            else:
+                codec = client_answer['entities']['intent'][0]['value']
+                text = texts.dictionary[codec]
+                bot.sendMessage(uid, text=text, reply_markup=kbd(main_kbd))
+        except KeyError:
+            bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd))
 
 
 
@@ -312,7 +326,7 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
-def cancel(bot, update):
+def stop(bot, update):
     bot.sendMessage(update.message.chat_id,
                     text='Bye! I hope we can talk again some day.')
     return ConversationHandler.END
@@ -337,19 +351,19 @@ def main():
         states={
             AGE: [MessageHandler([Filters.text], age)],
             CHECK_AGE: [MessageHandler([Filters.text], check_age)],
-            MAIN_MENU: [RegexHandler(main_kbd[0][0], about),
-                        RegexHandler(main_kbd[0][1], qa),
-                        RegexHandler(main_kbd[1][0], diseases),
-                        RegexHandler(main_kbd[1][1], info),
+            MAIN_MENU: [RegexHandler(flatten(main_kbd)[0], about),
+                        RegexHandler(flatten(main_kbd)[1], qa),
+                        RegexHandler(flatten(main_kbd)[2], diseases),
+                        RegexHandler(flatten(main_kbd)[3], info),
                         MessageHandler([Filters.text], main_menu)] + command_handlers,
             INFO: [MessageHandler([Filters.text], info)] + command_handlers,
             MARATHON: [RegexHandler(flatten(marathon_kbd)[0], schedule),
                        RegexHandler(flatten(marathon_kbd)[1], route),
                        RegexHandler(flatten(marathon_kbd)[2], main_menu),
                        MessageHandler([Filters.text], main_menu)] + command_handlers,
-            ROUTE: [RegexHandler(distance_kbd[0][0], distance_42),
-                    RegexHandler(distance_kbd[0][1], distance_10),
-                    RegexHandler(distance_kbd[0][2], main_menu),
+            ROUTE: [RegexHandler(flatten(distance_kbd)[0], distance_42),
+                    RegexHandler(flatten(distance_kbd)[1], distance_10),
+                    RegexHandler(flatten(distance_kbd)[2], main_menu),
                     MessageHandler([Filters.text], main_menu)] + command_handlers,
             SELECT_CAT: [RegexHandler(flatten(main_cat_kbd)[0], start_q),
                          RegexHandler(flatten(main_cat_kbd)[1], health_cats),
@@ -388,7 +402,7 @@ def main():
                      MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler('stop', stop)]
     )
 
     dp.add_handler(conv_handler)
