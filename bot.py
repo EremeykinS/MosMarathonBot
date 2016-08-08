@@ -12,12 +12,12 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('Marathon_test_bot.' + __name__)
 
 AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q, ANSWER, SELECT_DISEASE, \
-LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
-BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
-HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
-APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6, \
-CONVULSION_FA, CONVULSION_Q2, CONVULSION_Q3, CONVULSION_Q4, CONVULSION_Q5, CONVULSION_Q6, CONVULSION_Q7, \
-CONVULSION_Q8 = range(59)
+    LEG_FA, LEG_Q1, LEG_Q2, LEG_Q3, LEG_Q4, LEG_Q5, LEG_Q6, BACK_FA, BACK_Q2, BACK_Q3, BACK_Q4, BACK_Q5, \
+    BACK_Q6, BACK_Q7, CHEST_FA, CHEST_Q2, CHEST_Q3, CHEST_Q4, CHEST_Q5, CHEST_Q6, CHEST_Q7, CHEST_Q8, \
+    HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
+    APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6, \
+    CONVULSION_FA, CONVULSION_Q2, CONVULSION_Q3, CONVULSION_Q4, CONVULSION_Q5, CONVULSION_Q6, CONVULSION_Q7, \
+    CONVULSION_Q8, HEALTH_ALL = range(60)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
@@ -209,11 +209,25 @@ def answer(bot, update):
     return next_state
 
 
+def health_all(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.health_all, reply_markup=kbd(health_all_kbd))
+    return HEALTH_ALL
+
+
 def diseases(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
     bot.sendMessage(uid, text=texts.select_disease, reply_markup=kbd(diseases_kbd))
     return SELECT_DISEASE
+
+
+def show_diseases(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.diseases, reply_markup=kbd(health_all_kbd))
+    return HEALTH_ALL
 
 
 def leg_q1(bot, update):
@@ -876,17 +890,8 @@ def nothing_q1(bot, update):
     bot.sendMessage(uid, text=texts.no_disease, reply_markup=kbd(main_menu_kbd))
 
 
-def helper(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Help!')
-
-
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
-
-
-def stop(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Bye! I hope we can talk again some day.')
-    return ConversationHandler.END
 
 
 def main():
@@ -910,7 +915,7 @@ def main():
             CHECK_AGE: [MessageHandler([Filters.text], check_age)],
             MAIN_MENU: [RegexHandler(flatten(main_kbd)[0], about),
                         RegexHandler(flatten(main_kbd)[1], qa),
-                        RegexHandler(flatten(main_kbd)[2], diseases),
+                        RegexHandler(flatten(main_kbd)[2], health_all),
                         RegexHandler(flatten(main_kbd)[3], info),
                         MessageHandler([Filters.text], main_menu)] + command_handlers,
             INFO: [MessageHandler([Filters.text], info)] + command_handlers,
@@ -930,6 +935,8 @@ def main():
                          MessageHandler([Filters.text], main_menu)] + command_handlers,
             HEALTH_Q: [MessageHandler([Filters.text], health_q)] + command_handlers,
             ANSWER: [MessageHandler([Filters.text], answer)] + command_handlers,
+            HEALTH_ALL: [RegexHandler(flatten(health_all_kbd)[0], diseases),
+                         RegexHandler(flatten(health_all_kbd)[1], show_diseases)] + command_handlers,
             SELECT_DISEASE: [RegexHandler(flatten(diseases_kbd)[0], leg_q1),
                              RegexHandler(flatten(diseases_kbd)[1], back_q1),
                              RegexHandler(flatten(diseases_kbd)[2], chest_q1),
@@ -1082,7 +1089,7 @@ def main():
                             MessageHandler([Filters.text], main_menu)] + command_handlers,
         },
 
-        fallbacks=[CommandHandler('stop', stop)]
+        fallbacks=[]
     )
 
     dp.add_handler(conv_handler)
