@@ -17,7 +17,7 @@ AGE, CHECK_AGE, MAIN_MENU, MARATHON, QA, PAIN, INFO, ROUTE, SELECT_CAT, HEALTH_Q
     HAND_FA, HAND_Q2, HAND_Q3, HAND_Q4, HAND_Q5, HAND_Q6, HAND_Q7, HAND_Q8, HAND_Q9, HAND_Q10, \
     APNEA_FA, APNEA_Q1, APNEA_Q2, APNEA_Q3, APNEA_Q4, APNEA_Q5, APNEA_Q6, \
     CONVULSION_FA, CONVULSION_Q2, CONVULSION_Q3, CONVULSION_Q4, CONVULSION_Q5, CONVULSION_Q6, CONVULSION_Q7, \
-    CONVULSION_Q8, HEALTH_ALL = range(60)
+    CONVULSION_Q8, HEALTH_ALL, HEALTH_CHECK = range(61)
 
 typing = telegram.ChatAction.TYPING
 chat = dict()
@@ -59,8 +59,15 @@ def check_age(bot, update):
         return CHECK_AGE
     else:
         chat[uid]['age'] = ans
-        bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
-        return MAIN_MENU
+        bot.sendMessage(uid, text=texts.check_health, reply_markup=kbd(yes_no_kbd))
+        return HEALTH_CHECK
+
+
+def no_health_check(bot, update):
+    uid = update.message.from_user.id
+    bot.sendChatAction(uid, action=typing)
+    bot.sendMessage(uid, text=texts.no_check_health % chat[uid]['name'], reply_markup=kbd(main_kbd))
+    return MAIN_MENU
 
 
 def main_menu(bot, update):
@@ -913,6 +920,8 @@ def main():
         states={
             AGE: [MessageHandler([Filters.text], age)],
             CHECK_AGE: [MessageHandler([Filters.text], check_age)],
+            HEALTH_CHECK: [RegexHandler(flatten(yes_no_kbd)[yes], diseases),
+                           RegexHandler(flatten(yes_no_kbd)[no], no_health_check)],
             MAIN_MENU: [RegexHandler(flatten(main_kbd)[0], about),
                         RegexHandler(flatten(main_kbd)[1], qa),
                         RegexHandler(flatten(main_kbd)[2], health_all),
