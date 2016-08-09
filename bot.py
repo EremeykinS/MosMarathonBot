@@ -6,6 +6,7 @@ from wit import Wit
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, RegexHandler
 import logging
 import telegram
+import pickle
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -33,7 +34,7 @@ def flatten(nl):
 
 
 def start(bot, update):
-    bot.sendMessage(update.message.chat_id, text=texts.welcome)
+    bot.sendMessage(update.message.chat_id, text=texts.welcome, parse_mode="HTML")
     return AGE
 
 
@@ -44,9 +45,9 @@ def age(bot, update):
     if chat.get(uid) is None:
         chat[uid] = dict()
         chat[uid]['name'] = ans
-        bot.sendMessage(uid, text=texts.greeting % ans, reply_markup=kbd(age_kbd))
+        bot.sendMessage(uid, text=texts.greeting % ans, reply_markup=kbd(age_kbd), parse_mode="HTML")
     else:
-        bot.sendMessage(uid, text=texts.greeting % chat[uid]['name'], reply_markup=kbd(age_kbd))
+        bot.sendMessage(uid, text=texts.greeting % chat[uid]['name'], reply_markup=kbd(age_kbd), parse_mode="HTML")
     return CHECK_AGE
 
 
@@ -55,18 +56,18 @@ def check_age(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans not in flatten(age_kbd):
-        bot.sendMessage(uid, text=texts.wrong_age % chat[uid]['name'], reply_markup=kbd(age_kbd))
+        bot.sendMessage(uid, text=texts.wrong_age % chat[uid]['name'], reply_markup=kbd(age_kbd), parse_mode="HTML")
         return CHECK_AGE
     else:
         chat[uid]['age'] = ans
-        bot.sendMessage(uid, text=texts.check_health, reply_markup=kbd(yes_no_kbd))
+        bot.sendMessage(uid, text=texts.check_health, reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
         return HEALTH_CHECK
 
 
 def no_health_check(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.no_check_health % chat[uid]['name'], reply_markup=kbd(main_kbd))
+    bot.sendMessage(uid, text=texts.no_check_health % chat[uid]['name'], reply_markup=kbd(main_kbd), parse_mode="HTML")
     return MAIN_MENU
 
 
@@ -75,20 +76,19 @@ def main_menu(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if main_menu_kbd[0][0] in ans:
-        bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd))
-        return MAIN_MENU
+        bot.sendMessage(uid, text=texts.main_menu % chat[uid]['name'], reply_markup=kbd(main_kbd), parse_mode="HTML")
     else:
         client_answer = client.message(ans)
-        print(client_answer)
         try:
             if client_answer['entities']['intent'][0]['confidence'] < 0.6:
-                bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd))
+                bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd), parse_mode="HTML")
             else:
                 codec = client_answer['entities']['intent'][0]['value']
                 text = texts.dictionary[codec]
                 bot.sendMessage(uid, text=text, reply_markup=kbd(main_kbd))
         except KeyError:
-            bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd))
+            bot.sendMessage(uid, text=texts.unknown_q, reply_markup=kbd(main_kbd), parse_mode="HTML")
+    return MAIN_MENU
 
 
 def info(bot, update):
@@ -101,7 +101,7 @@ def info(bot, update):
 def qa(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.select_cat, reply_markup=kbd(main_cat_kbd))
+    bot.sendMessage(uid, text=texts.select_cat, reply_markup=kbd(main_cat_kbd), parse_mode="HTML")
     return SELECT_CAT
 
 
@@ -142,7 +142,8 @@ def distance_10(bot, update):
 def start_q(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.select_q, reply_markup=kbd([[texts.first_time_q], [texts.back_to_all_cat_btn]]))
+    bot.sendMessage(uid, text=texts.select_q, reply_markup=kbd([[texts.first_time_q], [texts.back_to_all_cat_btn]]),
+                    parse_mode="HTML")
     return ANSWER
 
 
@@ -165,7 +166,7 @@ def health_q(bot, update):
     elif ans == flatten(health_cat_kbd)[2]:
         next_state = SELECT_CAT
         keyboard = main_cat_kbd
-    bot.sendMessage(uid, text=texts.select_q, reply_markup=kbd(keyboard))
+    bot.sendMessage(uid, text=texts.select_q, reply_markup=kbd(keyboard), parse_mode="HTML")
     return next_state
 
 
@@ -219,99 +220,99 @@ def answer(bot, update):
 def health_all(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.health_all, reply_markup=kbd(health_all_kbd))
+    bot.sendMessage(uid, text=texts.health_all, reply_markup=kbd(health_all_kbd), parse_mode="HTML")
     return HEALTH_ALL
 
 
 def diseases(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.select_disease, reply_markup=kbd(diseases_kbd))
+    bot.sendMessage(uid, text=texts.select_disease, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     return SELECT_DISEASE
 
 
 def show_diseases(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.diseases, reply_markup=kbd(health_all_kbd))
+    bot.sendMessage(uid, text=texts.diseases, reply_markup=kbd(health_all_kbd), parse_mode="HTML")
     return HEALTH_ALL
 
 
 def leg_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_Q2
 
 
 def leg_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_Q3
 
 
 def leg_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_Q4
 
 
 def leg_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_Q5
 
 
 def leg_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_Q6
 
 
 def leg_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.leg_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return LEG_FA
 
 
 def leg_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.leg_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def leg_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.leg_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def leg_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.leg_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def leg_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.leg_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def leg_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.leg_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.leg_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def leg_a6(bot, update):
@@ -319,101 +320,101 @@ def leg_a6(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.leg_a6y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.leg_a6y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.leg_a6n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.leg_a6n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q2
 
 
 def back_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q3
 
 
 def back_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q4
 
 
 def back_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q5
 
 
 def back_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q6
 
 
 def back_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_Q7
 
 
 def back_q7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.back_q[7 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return BACK_FA
 
 
 def back_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.back_a[6 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.back_a[6 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def back_a7(bot, update):
@@ -421,115 +422,115 @@ def back_a7(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.back_a7y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.back_a7y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.back_a7n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.back_a7n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q2
 
 
 def chest_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q3
 
 
 def chest_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q4
 
 
 def chest_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q5
 
 
 def chest_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q6
 
 
 def chest_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q7
 
 
 def chest_q7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[7 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_Q8
 
 
 def chest_q8(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.chest_q[8 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CHEST_FA
 
 
 def chest_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[6 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[6 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.chest_a[7 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.chest_a[7 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def chest_a8(bot, update):
@@ -537,143 +538,143 @@ def chest_a8(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.chest_a8y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.chest_a8y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.chest_a8n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.chest_a8n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q2
 
 
 def hand_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q3
 
 
 def hand_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q4
 
 
 def hand_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q5
 
 
 def hand_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q6
 
 
 def hand_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q7
 
 
 def hand_q7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[7 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q8
 
 
 def hand_q8(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[8 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q9
 
 
 def hand_q9(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[9 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[9 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_Q10
 
 
 def hand_q10(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_q[10 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.hand_q[10 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return HAND_FA
 
 
 def hand_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[6 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[6 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[7 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[7 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a8(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[8 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[8 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a9(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.hand_a[9 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.hand_a[9 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def hand_a10(bot, update):
@@ -681,87 +682,87 @@ def hand_a10(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.hand_a10y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.hand_a10y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.hand_a10n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.hand_a10n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_Q2
 
 
 def apnea_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_Q3
 
 
 def apnea_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_Q4
 
 
 def apnea_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_Q5
 
 
 def apnea_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_Q6
 
 
 def apnea_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.apnea_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return APNEA_FA
 
 
 def apnea_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.apnea_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.apnea_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.apnea_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.apnea_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.apnea_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.apnea_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def apnea_a6(bot, update):
@@ -769,115 +770,115 @@ def apnea_a6(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.apnea_a6y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.apnea_a6y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.apnea_a6n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.apnea_a6n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[1 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[1 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q2
 
 
 def convulsion_q2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[2 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[2 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q3
 
 
 def convulsion_q3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[3 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[3 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q4
 
 
 def convulsion_q4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[4 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[4 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q5
 
 
 def convulsion_q5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[5 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[5 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q6
 
 
 def convulsion_q6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[6 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[6 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q7
 
 
 def convulsion_q7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[7 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[7 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_Q8
 
 
 def convulsion_q8(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_q[8 - 1], reply_markup=kbd(yes_no_kbd))
+    bot.sendMessage(uid, text=texts.convulsion_q[8 - 1], reply_markup=kbd(yes_no_kbd), parse_mode="HTML")
     return CONVULSION_FA
 
 
 def convulsion_a1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[1 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[1 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a2(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[2 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[2 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a3(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[3 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[3 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a4(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[4 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[4 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a5(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[5 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[5 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a6(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[6 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[6 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a7(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.convulsion_a[7 - 1], reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+    bot.sendMessage(uid, text=texts.convulsion_a[7 - 1], reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def convulsion_a8(bot, update):
@@ -885,16 +886,17 @@ def convulsion_a8(bot, update):
     bot.sendChatAction(uid, action=typing)
     ans = update.message.text
     if ans == flatten(yes_no_kbd)[yes]:
-        bot.sendMessage(uid, text=texts.convulsion_a8y, reply_markup=kbd(main_kbd))
+        bot.sendMessage(uid, text=texts.convulsion_a8y, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
     elif ans == flatten(yes_no_kbd)[no]:
-        bot.sendMessage(uid, text=texts.convulsion_a8n, reply_markup=kbd(main_kbd))
-    return MAIN_MENU
+        bot.sendMessage(uid, text=texts.convulsion_a8n, reply_markup=kbd(diseases_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def nothing_q1(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.no_disease, reply_markup=kbd(main_menu_kbd))
+    bot.sendMessage(uid, text=texts.no_disease, reply_markup=kbd(main_menu_kbd), parse_mode="HTML")
+    return SELECT_DISEASE
 
 
 def error(bot, update, error):
@@ -902,6 +904,7 @@ def error(bot, update, error):
 
 
 def main():
+    global chat
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(telegram_token)
 
@@ -919,34 +922,45 @@ def main():
 
         states={
             AGE: [MessageHandler([Filters.text], age)],
+
             CHECK_AGE: [MessageHandler([Filters.text], check_age)],
+
             HEALTH_CHECK: [RegexHandler(flatten(yes_no_kbd)[yes], diseases),
                            RegexHandler(flatten(yes_no_kbd)[no], no_health_check)],
+
             MAIN_MENU: [RegexHandler(flatten(main_kbd)[0], about),
                         RegexHandler(flatten(main_kbd)[1], qa),
                         RegexHandler(flatten(main_kbd)[2], health_all),
                         RegexHandler(flatten(main_kbd)[3], info),
                         MessageHandler([Filters.text], main_menu)] + command_handlers,
+
             INFO: [MessageHandler([Filters.text], info)] + command_handlers,
+
             MARATHON: [RegexHandler(flatten(marathon_kbd)[0], schedule),
                        RegexHandler(flatten(marathon_kbd)[1], route),
                        RegexHandler(flatten(marathon_kbd)[2], main_menu),
                        MessageHandler([Filters.text], main_menu)] + command_handlers,
+
             ROUTE: [RegexHandler(flatten(distance_kbd)[0], distance_42),
                     RegexHandler(flatten(distance_kbd)[1], distance_10),
                     RegexHandler(flatten(distance_kbd)[2], main_menu),
                     MessageHandler([Filters.text], main_menu)] + command_handlers,
+
             SELECT_CAT: [RegexHandler(flatten(main_cat_kbd)[0], start_q),
                          RegexHandler(flatten(main_cat_kbd)[1], health_cats),
                          RegexHandler(flatten(main_cat_kbd)[2], clothes_q),
                          RegexHandler(flatten(main_cat_kbd)[3], regime_q),
                          RegexHandler(flatten(main_cat_kbd)[4], main_menu),
                          MessageHandler([Filters.text], main_menu)] + command_handlers,
+
             HEALTH_Q: [MessageHandler([Filters.text], health_q)] + command_handlers,
+
             ANSWER: [MessageHandler([Filters.text], answer)] + command_handlers,
+
             HEALTH_ALL: [RegexHandler(flatten(health_all_kbd)[0], diseases),
                          RegexHandler(flatten(health_all_kbd)[1], show_diseases),
                          RegexHandler(flatten(health_all_kbd)[2], main_menu)] + command_handlers,
+
             SELECT_DISEASE: [RegexHandler(flatten(diseases_kbd)[0], leg_q1),
                              RegexHandler(flatten(diseases_kbd)[1], back_q1),
                              RegexHandler(flatten(diseases_kbd)[2], chest_q1),
@@ -1102,7 +1116,24 @@ def main():
         fallbacks=[]
     )
 
+    data_saved = True
+    conversations_file = 'conversations'
+    try:
+        open(conversations_file, mode='rb')
+    except IOError as e:
+        print('не удалось открыть файл')
+        data_saved = False
+
+    if data_saved:
+        chat, conv_handler.conversations = pickle.load(open(conversations_file, mode='rb'))
+
     dp.add_handler(conv_handler)
+
+    # updater.start_polling()
+    #
+    # updater.idle()
+
+
 
     # log all errors
     dp.add_error_handler(error)
@@ -1114,6 +1145,9 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+    pickle.dump((chat, conv_handler.conversations), open(conversations_file, mode='wb'))
+    print('saved')
 
 
 if __name__ == '__main__':
