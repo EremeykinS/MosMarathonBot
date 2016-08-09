@@ -190,7 +190,6 @@ def answer(bot, update):
     ans = update.message.text
     next_state = ANSWER
     if ans == texts.first_time_q:
-        print('answering...')
         text = texts.first_time_a
         keyboard = [[texts.first_time_q], [texts.back_to_all_cat_btn]]
     elif ans in texts.health_c1_q:
@@ -959,7 +958,9 @@ def main():
 
             HEALTH_ALL: [RegexHandler(flatten(health_all_kbd)[0], diseases),
                          RegexHandler(flatten(health_all_kbd)[1], show_diseases),
-                         RegexHandler(flatten(health_all_kbd)[2], main_menu)] + command_handlers,
+                         RegexHandler(flatten(health_all_kbd)[2], main_menu),
+                         MessageHandler([Filters.text], main_menu)
+                         ] + command_handlers,
 
             SELECT_DISEASE: [RegexHandler(flatten(diseases_kbd)[0], leg_q1),
                              RegexHandler(flatten(diseases_kbd)[1], back_q1),
@@ -1120,20 +1121,13 @@ def main():
     conversations_file = 'conversations'
     try:
         open(conversations_file, mode='rb')
-    except IOError as e:
-        print('не удалось открыть файл')
+    except IOError:
         data_saved = False
 
     if data_saved:
         chat, conv_handler.conversations = pickle.load(open(conversations_file, mode='rb'))
 
     dp.add_handler(conv_handler)
-
-    # updater.start_polling()
-    #
-    # updater.idle()
-
-
 
     # log all errors
     dp.add_error_handler(error)
