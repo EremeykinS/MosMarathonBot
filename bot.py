@@ -35,6 +35,7 @@ def flatten(nl):
 
 def start(bot, update):
     bot.sendMessage(update.message.chat_id, text=texts.welcome, parse_mode="HTML")
+    bot.sendMessage(update.message.chat_id, text=texts.whatsyourname, parse_mode="HTML")
     return AGE
 
 
@@ -94,7 +95,7 @@ def main_menu(bot, update):
 def info(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.info, reply_markup=kbd(main_kbd), parse_mode="HTML")
+    bot.sendMessage(uid, text=texts.info, reply_markup=kbd(main_kbd), parse_mode="HTML", disable_web_page_preview=True)
     return MAIN_MENU
 
 
@@ -115,7 +116,7 @@ def about(bot, update):
 def route(bot, update):
     uid = update.message.from_user.id
     bot.sendChatAction(uid, action=typing)
-    bot.sendMessage(uid, text=texts.route, reply_markup=kbd(distance_kbd), parse_mode="HTML")
+    bot.sendMessage(uid, text=texts.route, reply_markup=kbd(distance_kbd), parse_mode="HTML", disable_web_page_preview=True)
     return ROUTE
 
 
@@ -916,7 +917,7 @@ def main():
                         CommandHandler('info', info)]
 
     # Add conversation handler with the states
-    conv_handler = ConversationHandler(
+    conversation_handler = ConversationHandler(
         entry_points=command_handlers,
 
         states={
@@ -1125,9 +1126,9 @@ def main():
         data_saved = False
 
     if data_saved:
-        chat, conv_handler.conversations = pickle.load(open(conversations_file, mode='rb'))
+        chat, conversation_handler.conversations = pickle.load(open(conversations_file, mode='rb'))
 
-    dp.add_handler(conv_handler)
+    dp.add_handler(conversation_handler)
 
     # log all errors
     dp.add_error_handler(error)
@@ -1140,7 +1141,7 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
-    pickle.dump((chat, conv_handler.conversations), open(conversations_file, mode='wb'))
+    pickle.dump((chat, conversation_handler.conversations), open(conversations_file, mode='wb'))
     print('saved')
 
 
